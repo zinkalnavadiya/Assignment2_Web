@@ -1,22 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const FinancePage = () => {
-  const [stocks, setStocks] = useState(null);
+function FinancePage() {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+
+  const API_KEY = "d1u3j91r01qle668dog0d1u3j91r01qle668dogg";
+  const symbol = "AAPL";
 
   useEffect(() => {
-    axios.get(`https://financialmodelingprep.com/api/v3/quote/AAPL?apikey=YOUR_API_KEY`)
-      .then(res => setStocks(res.data[0]));
+    axios.get(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`)
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((err) => {
+        setError("Finance API error: " + err.message);
+        console.error(err);
+      });
   }, []);
 
   return (
     <div>
-      <h2>Finance</h2>
-      {stocks ? (
-        <p>{stocks.name} ({stocks.symbol}): ${stocks.price}</p>
-      ) : <p>Loading...</p>}
+      <h2>Finance Widget</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {data ? (
+        <div>
+          <p><strong>Symbol:</strong> {symbol}</p>
+          <p><strong>Current Price:</strong> ${data.c}</p>
+          <p><strong>Open:</strong> ${data.o}</p>
+          <p><strong>High:</strong> ${data.h}</p>
+          <p><strong>Low:</strong> ${data.l}</p>
+        </div>
+      ) : !error && <p>Loading...</p>}
     </div>
   );
-};
+}
 
 export default FinancePage;
